@@ -17,6 +17,6 @@ public class ProgramMenu extends JMenuBar {
         // toolMenu.setText("Tools");
         // toolMenu.setToolTipText("Various Tools/Formulas");
         prefMenu.setText("Preferences");
-        prefMenu.setToolTipText("Preferences & Mode Selection");
+        prefMenu.setToolTipText("Personal Preferences/Options");
     }
 }
