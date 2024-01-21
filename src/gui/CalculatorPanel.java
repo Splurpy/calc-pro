@@ -23,6 +23,7 @@ public class CalculatorPanel extends JPanel {
     public CalculatorPanel() {
         super();
         this.setLayout(new BorderLayout());
+        displayField.setFocusable(false);
         this.add(displayField, BorderLayout.NORTH);
         this.add(buttonPad, BorderLayout.CENTER);
         initDisplay();
