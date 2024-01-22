@@ -106,6 +106,40 @@ public class CalculatorPanel extends JPanel {
     }, keyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
   
+  public void copyDisplay() {
+    Toolkit.getDefaultToolkit().getSystemClipboard()
+        .setContents(new StringSelection(displayContents), null);
+  }
+  
+  public void pasteDisplay() {
+    try {
+      String clipboard = (String) (Toolkit.getDefaultToolkit().getSystemClipboard()
+          .getContents(this)).getTransferData(DataFlavor.stringFlavor);
+      if (CalcButtonListener.isNumeric(clipboard)) {
+        displayContents = clipboard;
+      } else if (clipboard.equals("e")) {
+        displayContents = String.valueOf(Math.E);
+      } else {
+        displayContents = CalcButtonListener.ERROR;
+      }
+    
+      // When operand2 is null, operator is not null, and operand 1 is not null
+      if ((CalcButtonListener.getOpd2() == null) && (CalcButtonListener.getOp() != null) && (
+          CalcButtonListener.getOpd1() != null)) {
+        displayContents = clipboard;
+        CalcButtonListener.setOpd2(clipboard);
+        System.out.println("[DEBUG] Opd1: " + CalcButtonListener.getOpd1());
+        System.out.println("[DEBUG] Op: " + CalcButtonListener.getOp());
+        System.out.println("[DEBUG] Opd2: " + CalcButtonListener.getOpd2());
+      }
+    } catch (UnsupportedFlavorException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    refreshDisplay();
+  }
+  
   private void initDisplay() {
     displayField.setText(displayContents);
     displayField.setHorizontalAlignment(JTextField.RIGHT);
@@ -114,47 +148,6 @@ public class CalculatorPanel extends JPanel {
     displayField.setFont(
         new Font(displayField.getFont().getName(), displayField.getFont().getStyle(), 18));
     displayField.setPreferredSize(new Dimension(230, 40));
-    // ActionListening beyond this point
-    displayField.registerKeyboardAction(new ActionListener() { // Copying from display
-                                          @Override public void actionPerformed(ActionEvent event) {
-                                            Toolkit.getDefaultToolkit().getSystemClipboard()
-                                                .setContents(new StringSelection(displayContents), null);
-                                          }
-                                        }, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK),
-        JComponent.WHEN_IN_FOCUSED_WINDOW);
-    
-    // Pasting into display
-    displayField.registerKeyboardAction(new ActionListener() {
-                                          @Override public void actionPerformed(ActionEvent event) {
-                                            try {
-                                              String clipboard = (String) (Toolkit.getDefaultToolkit().getSystemClipboard()
-                                                  .getContents(this)).getTransferData(DataFlavor.stringFlavor);
-                                              if (CalcButtonListener.isNumeric(clipboard)) {
-                                                displayContents = clipboard;
-                                              } else if (clipboard.equals("e")) {
-                                                displayContents = String.valueOf(Math.E);
-                                              } else {
-                                                displayContents = CalcButtonListener.ERROR;
-                                              }
-          
-                                              // When operand2 is null, operator is not null, and operand 1 is not null
-                                              if ((CalcButtonListener.getOpd2() == null) && (CalcButtonListener.getOp() != null) && (
-                                                  CalcButtonListener.getOpd1() != null)) {
-                                                displayContents = clipboard;
-                                                CalcButtonListener.setOpd2(clipboard);
-                                                System.out.println("[DEBUG] Opd1: " + CalcButtonListener.getOpd1());
-                                                System.out.println("[DEBUG] Op: " + CalcButtonListener.getOp());
-                                                System.out.println("[DEBUG] Opd2: " + CalcButtonListener.getOpd2());
-                                              }
-                                            } catch (UnsupportedFlavorException e) {
-                                              throw new RuntimeException(e);
-                                            } catch (IOException e) {
-                                              throw new RuntimeException(e);
-                                            }
-                                            refreshDisplay();
-                                          }
-                                        }, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK),
-        JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
   
   private void initButtonPad() {

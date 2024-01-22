@@ -17,6 +17,16 @@ public class CalcButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent event) {
+        try {
+            innerActionPerformed(event);
+        } catch (Throwable thrown) {
+            // Handle saving to log files if wanted
+            thrown.printStackTrace();
+            CalculatorWindow.calcPanel.setDisplayContents(ERROR);
+        }
+    }
+    
+    public void innerActionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         CalculatorPanel calcPanel = ((CalculatorPanel) ((JButton) event.getSource()).getParent().getParent());
 
@@ -48,7 +58,12 @@ public class CalcButtonListener implements ActionListener {
             } else {
                 if (operand1 != null && command == "=") {
                     if (operand2 == null) operand2 = calcPanel.getDisplayContents();
-                    String result = op.operate(Double.parseDouble(operand1), Double.parseDouble(operand2));
+                    String result;
+                    try {
+                        result = op.operate(Double.parseDouble(operand1), Double.parseDouble(operand2));
+                    } catch (NumberFormatException nfe) {
+                        result = "ERROR";
+                    }
                     if (result.charAt(result.length() - 1) == '0' && result.charAt(result.length() - 2) == '.') result = result.substring(0, result.length() - 2);
                     System.out.println("[DEBUG] " + operand1 + " " + op.toString() + " " + operand2 + " = " + result);
                     calcPanel.setDisplayContents(result);
