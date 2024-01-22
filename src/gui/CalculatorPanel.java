@@ -2,11 +2,16 @@ package gui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 public class CalculatorPanel extends JPanel {
     private static final String[] BUTTONS = {
@@ -107,6 +112,29 @@ public class CalculatorPanel extends JPanel {
         displayField.setEditable(false);
         displayField.setFont(new Font(displayField.getFont().getName(), displayField.getFont().getStyle(), 18));
         displayField.setPreferredSize(new Dimension(230, 40));
+        // ActionListening beyond this point
+        displayField.registerKeyboardAction(new ActionListener() { // Copying from display
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(displayContents), null);
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        // Pasting into display
+        displayField.registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                try {
+                    // TODO Accept as 2nd op, check for only strings containing numbers, decimals, and e itself
+                    displayContents = (String) (Toolkit.getDefaultToolkit().getSystemClipboard().getContents(this)).getTransferData(DataFlavor.stringFlavor);
+                } catch (UnsupportedFlavorException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                refreshDisplay();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     private void initButtonPad() {
