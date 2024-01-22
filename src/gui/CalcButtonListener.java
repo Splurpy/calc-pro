@@ -47,12 +47,13 @@ public class CalcButtonListener implements ActionListener {
                 calcPanel.setDisplayContents(op.operate(Double.parseDouble(calcPanel.getDisplayContents()), 0.0));
             } else {
                 if (operand1 != null && command == "=") {
-                    operand2 = calcPanel.getDisplayContents();
+                    if (operand2 == null) operand2 = calcPanel.getDisplayContents();
                     String result = op.operate(Double.parseDouble(operand1), Double.parseDouble(operand2));
                     if (result.charAt(result.length() - 1) == '0' && result.charAt(result.length() - 2) == '.') result = result.substring(0, result.length() - 2);
                     System.out.println("[DEBUG] " + operand1 + " " + op.toString() + " " + operand2 + " = " + result);
                     calcPanel.setDisplayContents(result);
                     calcPanel.refreshDisplay();
+                    operand2 = null;
                 } else {
                     operand1 = calcPanel.getDisplayContents();
                     calcPanel.setDisplayContents(op.toString());
@@ -115,7 +116,7 @@ public class CalcButtonListener implements ActionListener {
         calcPanel.refreshDisplay();
     }
 
-    private static boolean isNumeric(String string) {
+    public static boolean isNumeric(String string) {
         if (string == null) return false;
         if (string == ".") return true;
         try {
@@ -125,5 +126,21 @@ public class CalcButtonListener implements ActionListener {
         }
 
         return true;
+    }
+    
+    public static final String getOpd1() {
+        return operand1;
+    }
+    
+    public static final String getOpd2() {
+        return operand2;
+    }
+    
+    public static final Operator getOp() {
+        return op;
+    }
+    
+    public static final void setOpd2(String operand) {
+        operand2 = operand;
     }
 }
